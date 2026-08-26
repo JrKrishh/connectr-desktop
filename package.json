@@ -1,0 +1,41 @@
+{
+  "name": "connectr-desktop",
+  "version": "0.1.0",
+  "description": "Windows desktop shell for the local ConnectR dashboard",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "test": "node --test test/*.test.js",
+    "smoke:tray": "electron test/tray-smoke.js",
+    "smoke:main": "electron test/main-smoke.js",
+    "smoke:renderer": "electron test/renderer-smoke.js"
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.solobrain.connectr-desktop",
+    "productName": "ConnectR Desktop",
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ConnectR Desktop"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**",
+      "renderer/**",
+      "assets/**"
+    ]
+  }
+}

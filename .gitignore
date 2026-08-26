@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.log
+
+# per-machine state, not source: the shared-brain store and the MCP registrations
+# that connectr init writes with absolute paths to this machine's install
+.connectr/
+.mcp.json
+.cursor/
+.kiro/
+.claude/

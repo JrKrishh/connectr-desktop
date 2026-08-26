@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>ConnectR</title>
+<style>
+  /* Same tokens as the dashboard this window opens into, so the app is one product. */
+  :root{
+    color-scheme: dark light;
+    --bg:#0F1312; --surface:#161B19; --raised:#1C2321; --border:#273230;
+    --ink:#E7EDEA; --muted:#8D9C96; --faint:#5E6B66;
+    --accent:#45C89A; --accent-ink:#08130F; --accent-dim:#1B3A31; --red:#E0706C;
+    --r:10px;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"Cascadia Code","SF Mono","Consolas",monospace;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#F6F8F7; --surface:#FFFFFF; --raised:#EFF3F1; --border:#DCE4E1;
+      --ink:#141C19; --muted:#5C6B65; --faint:#8A9993;
+      --accent:#06674E; --accent-ink:#FFFFFF; --accent-dim:#DDF0E8; --red:#B4403C;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font:14px/1.55 var(--sans);-webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;padding:40px 24px;
+  }
+  .shell{width:100%;max-width:560px}
+
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+  .brand svg{color:var(--accent);flex:none}
+  .brand .name{font-size:17px;font-weight:650;letter-spacing:-.01em}
+  .brand .name b{color:var(--accent);font-weight:650}
+
+  h1{font-size:21px;font-weight:600;letter-spacing:-.015em;margin:0 0 5px}
+  .sub{color:var(--muted);margin:0 0 22px;font-size:13.5px}
+
+  .label{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 9px}
+
+  ul{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:8px}
+  li button{
+    width:100%;text-align:left;font:inherit;color:var(--ink);
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+    padding:13px 15px;cursor:pointer;display:block;
+    transition:border-color .14s ease,transform .14s ease,background .14s ease;
+  }
+  li button:hover:enabled{border-color:var(--accent);background:var(--raised);transform:translateY(-1px)}
+  li button:active:enabled{transform:none}
+  li button:disabled{opacity:.45;cursor:default}
+  li button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .name{display:block;font-weight:600;font-size:14.5px;margin-bottom:2px}
+  .path{display:block;color:var(--muted);font-family:var(--mono);font-size:11.5px;word-break:break-all}
+
+  .empty{color:var(--muted);font-size:13.5px;margin:0 0 22px;padding:22px;
+    border:1px dashed var(--border);border-radius:var(--r);text-align:center;line-height:1.6}
+
+  form{margin:0}
+  fieldset{border:0;margin:0;padding:0;min-width:0}
+  fieldset[disabled]{opacity:.55}
+  .row{display:flex;gap:8px}
+  input{
+    flex:1;min-width:0;font:13.5px var(--sans);padding:11px 13px;
+    border:1px solid var(--border);border-radius:var(--r);
+    background:var(--surface);color:var(--ink);outline:none;
+    transition:border-color .14s ease;
+  }
+  input::placeholder{color:var(--faint)}
+  input:focus{border-color:var(--accent)}
+  form button{
+    font:550 13px var(--sans);padding:11px 15px;border-radius:var(--r);cursor:pointer;
+    border:1px solid var(--border);background:var(--raised);color:var(--ink);white-space:nowrap;
+    transition:border-color .14s ease,filter .14s ease;
+  }
+  form button:hover:enabled{border-color:var(--accent)}
+  form button[type="submit"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  form button[type="submit"]:hover:enabled{filter:brightness(1.07)}
+  form button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .status{margin:16px 0 0;font-size:13px;color:var(--muted);
+    display:flex;align-items:center;gap:8px}
+  .status::before{content:"";width:7px;height:7px;border-radius:50%;
+    background:var(--accent);flex:none;animation:pulse 1.6s ease-in-out infinite}
+  .status.error{color:var(--red)}
+  .status.error::before{background:var(--red);animation:none}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6.5" r="2.4"/><circle cx="18" cy="6.5" r="2.4"/><circle cx="12" cy="17.5" r="2.4"/><path d="M8.4 6.5h7.2M7.3 8.6l3.4 6.8M16.7 8.6l-3.4 6.8"/></svg>
+      <span class="name">connect<b>r</b></span>
+    </div>
+
+    <h1>Open a project</h1>
+    <p class="sub">Every project keeps its own board, memory and agents. Pick one to open its dashboard.</p>
+
+    <p class="label">Projects</p>
+    <ul id="projects"></ul>
+    <p id="empty" class="empty" hidden>No projects yet.<br>Add a folder below &mdash; any folder ConnectR has been set up in.</p>
+
+    <p class="label">Add a project</p>
+    <form id="add-form">
+      <fieldset id="add-fields">
+        <div class="row">
+          <input id="path-input" type="text" placeholder="E:\Freelancing\my-app" aria-label="Project folder path" autocomplete="off" spellcheck="false">
+          <button type="button" id="browse">Browse&hellip;</button>
+          <button type="submit">Add</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <p id="status" class="status" hidden></p>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
