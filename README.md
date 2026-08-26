@@ -8,6 +8,50 @@ and points a native Electron window at `http://127.0.0.1:<port>`. What you get o
 of a browser tab is a project picker, a system tray, and a server child process whose
 lifetime is tied to the window's.
 
+## How this app was built
+
+Every file in this repo except `PLAN.md` was written by AI agents dispatched by
+[ConnectR](https://github.com/JrKrishh/connectr) — the tool this app is a shell for.
+
+A person wrote `PLAN.md` (the goal, the features, the constraints) and ran:
+
+```
+connectr new connectr-desktop --plan PLAN.md
+```
+
+ConnectR read the plan, worked out which installed coding tools the project needed, wired
+them to one shared brain, and seeded a single ticket: *decompose the plan into tickets*.
+The agent that claimed it read `PLAN.md` and created nine more. Those went out in four
+waves of headless agents running in parallel — each claiming its ticket on the shared
+board before writing a line, which is what kept two agents off the same file.
+
+The board kept the receipts:
+
+| | |
+|---|---|
+| Tickets | 10, every one closed `completed` |
+| Distinct agent sessions | 9 |
+| Interface contracts published between agents | 8 |
+| Shared memories written | 22 — 7 decisions, 7 facts, **8 lessons** |
+| Verification | 61 unit tests + 3 real-Electron smoke suites |
+
+The lessons are the part worth reading. When an agent hit a wall it recorded the root
+cause and the corrective action, so the next agent along didn't pay for it twice:
+
+> **Spawning the global `connectr` on Windows has two traps:** Node 24 throws `EINVAL`
+> for `spawn()` of a `.cmd` without a shell, and routing through `cmd.exe` mangles the
+> argument list. *Fix: resolve `connectr.cmd` on PATH yourself, then spawn ComSpec with
+> `['/d','/c',cliPath,...args]`.*
+
+> **A successful `project:open` navigates the BrowserWindow,** which destroys the renderer
+> context that issued `ipcRenderer.invoke` — so the `{ ok: true }` reply never arrives.
+> *Fix: renderers must treat "no reply" as success and render only the failure branch.*
+
+Both are load-bearing in `src/server.js` and `renderer/renderer.js` today. The second was
+written by the agent building the main process while the agent building the picker was
+still running — two processes on opposite sides of the same IPC boundary, three minutes
+apart, coordinating through nothing but the board.
+
 ## Prerequisites
 
 - **Node.js** (built and verified on v24.3.0, npm 11.4.2)
@@ -15,7 +59,7 @@ lifetime is tied to the window's.
   the app shells out to it by name and will not start a dashboard without it.
 
 ```
-npm i -g connectr
+npm i -g connectr-mcp
 connectr --version
 ```
 
