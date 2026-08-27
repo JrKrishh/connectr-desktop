@@ -86,6 +86,27 @@ second launch: because the app is single-instance, launching it again with a dif
 `--project` switches the window you already have instead of starting a rival. That makes
 per-project shortcuts possible - point a shortcut at the exe with the flag appended.
 
+## Keyboard
+
+You are never stuck inside a project. Every route out is an accelerator, and the
+application menu lists them all:
+
+| Key | Does |
+|---|---|
+| `Ctrl+K` | Switch project — a filterable list, arrows to move, enter to open |
+| `Ctrl+O` | Back to all projects |
+| `Ctrl+R` | Reload the dashboard |
+| `Ctrl+W` | Close to tray (the app keeps running) |
+| `Ctrl+Q` | Quit, stopping the dashboard server |
+
+**Project → Recent** holds your last eight projects, so switching is usually one menu
+click. The list rebuilds whenever you add a project.
+
+The switcher itself is rendered by the dashboard, not the shell: the preload exposes
+`window.connectr` to the page it loads, so the dashboard can tell it is running inside the
+desktop app and grow a **Projects** button and the `Ctrl+K` palette. Open the same
+dashboard in a browser and neither appears — it stays a plain web page.
+
 ## Build the installer
 
 ```

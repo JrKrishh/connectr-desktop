@@ -62,12 +62,17 @@ function createIpcHandlers({
   serverManager,
   dialog,
   getWindow,
-  waitForServer = waitForPort
+  waitForServer = waitForPort,
+  onProjectsChanged = () => {}
 }) {
   return {
     'projects:list': () => registry.readProjects(),
 
-    'projects:add': (_event, dirPath) => registry.addProject(dirPath),
+    'projects:add': (_event, dirPath) => {
+      const projects = registry.addProject(dirPath);
+      onProjectsChanged(); // a new project should appear under the menu's Recent list
+      return projects;
+    },
 
     'projects:pickFolder': async () => {
       const result = await dialog.showOpenDialog({ properties: ['openDirectory'] });
@@ -105,16 +110,19 @@ function bootstrap() {
   const registry = require('./src/registry');
   const { createServerManager } = require('./src/server');
   const { createTray, setupSingleInstance } = require('./src/tray');
+  const { installMenu } = require('./src/menu');
 
   const serverManager = createServerManager();
   let win = null;
   let trayHandle = null;
+  let menuHandle = null;
 
   const handlers = createIpcHandlers({
     registry,
     serverManager,
     dialog,
-    getWindow: () => win
+    getWindow: () => win,
+    onProjectsChanged: () => menuHandle && menuHandle.refresh()
   });
 
   // Must precede whenReady; a second launch focuses the window we already have,
@@ -152,6 +160,14 @@ function bootstrap() {
     }
 
     trayHandle = createTray(win, { onQuit: () => serverManager.stop() });
+
+    // The menu is the app's keyboard surface; rebuild it when the project list changes
+    // so Recent stays honest.
+    menuHandle = installMenu(() => win, {
+      onHome: () => handlers['project:home'](),
+      onQuit: () => app.quit(),
+      onOpenProject: (p) => handlers['project:open'](null, p)
+    });
   });
 
   // setQuitting lets the close through; both quit hooks stop the child because

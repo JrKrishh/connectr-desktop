@@ -115,6 +115,34 @@ app.whenReady().then(async () => {
     openedPort = Number(new URL(open.navigatedTo).port);
     check('dashboard is listening', await canConnect(openedPort), true);
 
+    // The dashboard is a plain web page everywhere else; inside the shell it must grow a
+    // way back to the picker and a switcher, or you are stuck in the project you opened.
+    check(
+      'dashboard detects the desktop shell',
+      await win.webContents.executeJavaScript('document.body.classList.contains("shell")'),
+      true
+    );
+    check(
+      'a Projects button is offered',
+      await win.webContents.executeJavaScript(
+        '!!document.getElementById("homeBtn") && getComputedStyle(document.getElementById("homeBtn")).display !== "none"'
+      ),
+      true
+    );
+    check(
+      'the menu can reach the switcher',
+      await win.webContents.executeJavaScript('typeof window.palOpen'),
+      'function'
+    );
+    check(
+      'the switcher lists projects',
+      await win.webContents.executeJavaScript(
+        'window.palOpen(), new Promise(function(r){setTimeout(function(){' +
+          'r(document.querySelectorAll("#palList .pal-i").length > 0);},700);})'
+      ),
+      true
+    );
+
     const home = await raceNavigation(win, 'window.connectr.goHome()');
     console.log('# project:home ->', JSON.stringify(home));
     check('project:home returned to the picker', (home.navigatedTo || '').endsWith('renderer/index.html'), true);
