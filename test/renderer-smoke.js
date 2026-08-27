@@ -73,6 +73,43 @@ app.whenReady().then(async () => {
     await settle();
     check('success keeps the starting state', await js('document.getElementById("status").textContent'), 'Starting server...');
     check('no error class on success', await js('document.getElementById("status").classList.contains("error")'), false);
+
+    // --- onboarding wizard ---------------------------------------------------
+    await js('window.openWizard()');
+    check('wizard opens on the folder step',
+      await js('!document.getElementById("wiz").hidden && !document.getElementById("wizFolder").hidden'), true);
+    check('folder step blocks an empty path', await js(`(() => {
+      document.getElementById("wizNext").click();
+      return document.getElementById("wizMsg").textContent;
+    })()`), 'choose a folder first');
+
+    await js('document.getElementById("wizPath").value = "E:\\\\demo"; document.getElementById("wizNext").click()');
+    await settle();
+    check('advances to the tools step', await js('!document.getElementById("wizTools").hidden'), true);
+    check('lists every detected tool', await js('document.querySelectorAll("#wizToolList .tool").length'), 4);
+    // claude-code (signed in) and cursor (a participant) are usable; codex is signed out
+    // and gemini is not installed, so neither may be given work.
+    check('preselects only what is usable', await js('document.querySelectorAll("#wizToolList .tool.picked").length'), 2);
+    check('a signed-out tool cannot be given work', await js(`(() => {
+      const rows = [...document.querySelectorAll("#wizToolList .tool")];
+      const codex = rows.find((r) => r.querySelector(".t-name").textContent === "codex");
+      return codex.querySelector("input").disabled;
+    })()`), true);
+    check('a signed-out tool offers Sign in', await js(`(() => {
+      const rows = [...document.querySelectorAll("#wizToolList .tool")];
+      const codex = rows.find((r) => r.querySelector(".t-name").textContent === "codex");
+      codex.querySelector("button").click();
+      return !!codex.querySelector("button");
+    })()`), true);
+    await settle();
+    check('sign in says what to do next',
+      await js('document.getElementById("wizMsg").textContent.includes("Re-check")'), true);
+
+    await js('document.getElementById("wizNext").click()');
+    await settle();
+    check('reaches plan or build', await js('!document.getElementById("wizStart").hidden'), true);
+    check('offers a way to skip planning',
+      await js('document.getElementById("wizCancel").textContent.includes("Skip")'), true);
   } catch (err) {
     console.log('FAIL threw:', err && err.message);
     failures.push('exception');

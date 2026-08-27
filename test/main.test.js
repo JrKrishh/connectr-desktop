@@ -61,13 +61,16 @@ function makeFixture(overrides = {}) {
   return { handlers: createIpcHandlers(deps), calls, win };
 }
 
-test('exports exactly the five contract channels', () => {
+test('exports exactly the contract channels', () => {
   assert.deepStrictEqual(IPC_CHANNELS, [
     'projects:list',
     'projects:add',
     'projects:pickFolder',
     'project:open',
-    'project:home'
+    'project:home',
+    'tools:detect',
+    'tools:signIn',
+    'project:create'
   ]);
 });
 

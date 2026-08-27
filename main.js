@@ -15,7 +15,10 @@ const IPC_CHANNELS = [
   'projects:add',
   'projects:pickFolder',
   'project:open',
-  'project:home'
+  'project:home',
+  'tools:detect',
+  'tools:signIn',
+  'project:create'
 ];
 
 // Accepts "--project <path>" and "--project=<path>" anywhere in argv, so one parse
@@ -63,7 +66,8 @@ function createIpcHandlers({
   dialog,
   getWindow,
   waitForServer = waitForPort,
-  onProjectsChanged = () => {}
+  onProjectsChanged = () => {},
+  onboard = require('./src/onboard')
 }) {
   return {
     'projects:list': () => registry.readProjects(),
@@ -85,14 +89,40 @@ function createIpcHandlers({
     // the renderer shows the error. Note the { ok: true } reply is only ever
     // seen by a caller that survives the navigation; the picker does not, which
     // is fine - success looks like the dashboard appearing.
-    'project:open': async (_event, projectPath) => {
+    'project:open': async (_event, projectPath, intent) => {
       try {
         const { port, url } = await serverManager.start(projectPath);
         await waitForServer(port);
+        // Onboarding can pass an intent; kick planning off before the window navigates so
+        // the board is already filling in by the time the user sees it.
+        if (intent) await onboard.postPlan(port, intent);
         await getWindow().loadURL(url);
         return { ok: true, url };
       } catch (err) {
         serverManager.stop();
+        return { ok: false, error: err.message };
+      }
+    },
+
+    // Onboarding. Detection and creation both shell out to the connectr CLI, and sign-in
+    // opens the tool's own login in a terminal - no credential is ever handled here.
+    'tools:detect': async (_event, dir) => {
+      try {
+        return { ok: true, tools: await onboard.detectTools({ cwd: dir || undefined }) };
+      } catch (err) {
+        return { ok: false, error: err.message };
+      }
+    },
+
+    'tools:signIn': (_event, command) => onboard.signIn(command),
+
+    'project:create': async (_event, opts = {}) => {
+      try {
+        const made = await onboard.createProject(opts.dir, opts.tools, opts.mode);
+        registry.addProject(made.dir);
+        onProjectsChanged();
+        return { ok: true, ...made };
+      } catch (err) {
         return { ok: false, error: err.message };
       }
     },

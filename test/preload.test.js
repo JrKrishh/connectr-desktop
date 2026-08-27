@@ -38,14 +38,17 @@ function loadPreload() {
   return { api: exposed, invocations };
 }
 
-test('exposes exactly the five contract methods on window.connectr', () => {
+test('exposes exactly the contract methods on window.connectr', () => {
   const { api } = loadPreload();
   assert.deepStrictEqual(Object.keys(api).sort(), [
     'addProject',
+    'createProject',
+    'detectTools',
     'goHome',
     'listProjects',
     'openProject',
     'pickFolder',
+    'signIn',
   ]);
   for (const key of Object.keys(api)) assert.strictEqual(typeof api[key], 'function');
 });
@@ -59,13 +62,19 @@ test('each method maps 1:1 onto its IPC channel, forwarding the path argument', 
   await api.pickFolder();
   await api.openProject(spaced);
   await api.goHome();
+  await api.detectTools(spaced);
+  await api.signIn('codex login');
+  await api.createProject({ dir: spaced, tools: ['codex'], mode: 'auto' });
 
   assert.deepStrictEqual(invocations, [
     { channel: 'projects:list', args: [] },
     { channel: 'projects:add', args: [spaced] },
     { channel: 'projects:pickFolder', args: [] },
-    { channel: 'project:open', args: [spaced] },
+    { channel: 'project:open', args: [spaced, undefined] },
     { channel: 'project:home', args: [] },
+    { channel: 'tools:detect', args: [spaced] },
+    { channel: 'tools:signIn', args: ['codex login'] },
+    { channel: 'project:create', args: [{ dir: spaced, tools: ['codex'], mode: 'auto' }] },
   ]);
 });
 

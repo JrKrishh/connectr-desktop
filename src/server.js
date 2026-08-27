@@ -112,4 +112,6 @@ function createServerManager(deps = {}) {
   return { start, stop, current };
 }
 
-module.exports = { createServerManager };
+// resolveCliPath/buildInvocation are exported so onboarding runs the CLI exactly the way
+// the dashboard does - the .cmd-shim handling here was hard won and must not be forked.
+module.exports = { createServerManager, resolveCliPath, buildInvocation, IS_WINDOWS };

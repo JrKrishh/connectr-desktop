@@ -88,6 +88,48 @@
   .status.error{color:var(--red)}
   .status.error::before{background:var(--red);animation:none}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* onboarding wizard */
+  .wiz{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;
+    justify-content:center;padding:8vh 20px;z-index:20}
+  .wiz-box{width:min(560px,94vw);background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+  .wiz-head{padding:20px 22px 14px;border-bottom:1px solid var(--border)}
+  .wiz-step{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)}
+  .wiz-head h2{margin:6px 0 4px;font-size:18px;font-weight:600;letter-spacing:-.015em}
+  .wiz-sub{margin:0;color:var(--muted);font-size:13px}
+  .wiz-body{padding:18px 22px;max-height:46vh;overflow:auto}
+  .wiz-body textarea{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--border);
+    border-radius:var(--r);padding:11px 13px;font:13.5px var(--sans);resize:vertical;outline:none}
+  .wiz-body textarea:focus{border-color:var(--accent)}
+  .wiz-foot{display:flex;align-items:center;gap:8px;padding:14px 22px;border-top:1px solid var(--border);
+    background:var(--raised)}
+  .wiz-msg{flex:1;font-size:12.5px;color:var(--muted);min-width:0;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .wiz-msg.error{color:var(--red)}
+  .wiz-foot button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .newproj{width:100%;margin:0 0 12px;padding:12px;border:1px dashed var(--border);
+    border-radius:var(--r);background:none;color:var(--accent);font:inherit;font-size:13.5px;
+    cursor:pointer;transition:border-color .14s ease}
+  .newproj:hover{border-color:var(--accent)}
+  .linky{background:none;border:none;color:var(--accent);font:inherit;font-size:12.5px;
+    cursor:pointer;padding:6px 0;text-decoration:underline}
+
+  .toollist{display:flex;flex-direction:column;gap:8px}
+  .tool{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--border);
+    border-radius:var(--r);background:var(--bg)}
+  .tool.picked{border-color:var(--accent)}
+  .tool.off{opacity:.5}
+  .tool input{width:16px;height:16px;accent-color:var(--accent);flex:none;margin:0}
+  .tool .t-main{flex:1;min-width:0}
+  .tool .t-name{font-size:13.5px;font-weight:600}
+  .tool .t-state{font-family:var(--mono);font-size:11px;color:var(--muted);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tool .t-state.warn{color:var(--red)}
+  .tool .t-state.ok{color:var(--accent)}
+  .tool button{font:inherit;font-size:12px;padding:5px 11px;border-radius:999px;
+    border:1px solid var(--border);background:var(--surface);color:var(--ink);cursor:pointer;flex:none}
+  .tool button:hover{border-color:var(--accent)}
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
 </style>
 </head>
@@ -106,6 +148,7 @@
     <p id="empty" class="empty" hidden>No projects yet.<br>Add a folder below &mdash; any folder ConnectR has been set up in.</p>
 
     <p class="label">Add a project</p>
+    <button type="button" class="newproj" id="new-project">+ New project (guided setup)</button>
     <form id="add-form">
       <fieldset id="add-fields">
         <div class="row">
@@ -119,6 +162,40 @@
     <p id="status" class="status" hidden></p>
   </div>
 
+  <div class="wiz" id="wiz" hidden>
+    <div class="wiz-box">
+      <div class="wiz-head">
+        <span class="wiz-step" id="wizStep">Step 1 of 3</span>
+        <h2 id="wizTitle">Choose a folder</h2>
+        <p class="wiz-sub" id="wizSub">This is where your agents will work.</p>
+      </div>
+
+      <section class="wiz-body" id="wizFolder">
+        <div class="row">
+          <input id="wizPath" type="text" placeholder="E:\Freelancing\my-app" aria-label="Project folder" autocomplete="off" spellcheck="false">
+          <button type="button" id="wizBrowse">Browse&hellip;</button>
+        </div>
+      </section>
+
+      <section class="wiz-body" id="wizTools" hidden>
+        <div id="wizToolList" class="toollist"></div>
+        <button type="button" class="linky" id="wizRecheck">Re-check</button>
+      </section>
+
+      <section class="wiz-body" id="wizStart" hidden>
+        <textarea id="wizIntent" rows="3" placeholder="Describe what you want built - ConnectR breaks it into tasks and routes them"></textarea>
+      </section>
+
+      <div class="wiz-foot">
+        <span class="wiz-msg" id="wizMsg"></span>
+        <button type="button" id="wizCancel">Cancel</button>
+        <button type="button" id="wizBack" hidden>Back</button>
+        <button type="button" class="primary" id="wizNext">Next</button>
+      </div>
+    </div>
+  </div>
+
   <script src="renderer.js"></script>
+  <script src="wizard.js"></script>
 </body>
 </html>
