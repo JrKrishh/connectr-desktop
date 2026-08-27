@@ -92,86 +92,15 @@ per-project shortcuts possible - point a shortcut at the exe with the flag appen
 
 1. **Choose a folder** — where the agents will work.
 2. **Pick your tools** — every coding tool on this machine, with whether it is installed
-   and signed in. Anything signed out gets a **Sign in** button that opens that tool own
+   and signed in. Anything signed out gets a **Sign in** button that opens that tool's own
    login in a terminal; **Re-check** re-reads the state. Only tools that are actually
    ready can be ticked, so you cannot hand work to a tool that will fail.
 3. **Plan or build** — describe an outcome and ConnectR breaks it into routed tasks before
    the board opens, or skip straight to the board.
 
-Detection comes from {
-  "tools": [
-    {
-      "tool": "claude-code",
-      "kind": "dispatch",
-      "installed": true,
-      "signedIn": true,
-      "signInHint": "claude",
-      "via": "claude on PATH",
-      "targetSlugs": [
-        "claude",
-        "claude-md"
-      ]
-    },
-    {
-      "tool": "codex",
-      "kind": "dispatch",
-      "installed": true,
-      "signedIn": true,
-      "signInHint": "codex login",
-      "via": "codex on PATH",
-      "targetSlugs": [
-        "codex"
-      ]
-    },
-    {
-      "tool": "gemini",
-      "kind": "dispatch",
-      "installed": true,
-      "signedIn": true,
-      "signInHint": "gemini",
-      "via": "gemini on PATH",
-      "targetSlugs": [
-        "gemini-md",
-        "gemini"
-      ]
-    },
-    {
-      "tool": "cursor",
-      "kind": "participant",
-      "installed": true,
-      "signedIn": null,
-      "via": "~/.cursor",
-      "targetSlugs": [
-        "cursor",
-        "cursor-rules"
-      ]
-    },
-    {
-      "tool": "kiro",
-      "kind": "participant",
-      "installed": true,
-      "signedIn": null,
-      "via": "~/.kiro",
-      "targetSlugs": [
-        "kiro",
-        "kiro-steering"
-      ]
-    },
-    {
-      "tool": "antigravity",
-      "kind": "participant",
-      "installed": true,
-      "signedIn": null,
-      "via": "~/.gemini/antigravity-ide",
-      "targetSlugs": [
-        "antigravity"
-      ]
-    }
-  ],
-  "permissionMode": "yolo"
-}, and creation runs  with the
-tools you picked. **This app never handles a credential**: signing in happens in the tool own
-CLI, and ConnectR only ever checks whether a credential file exists.
+Detection comes from `connectr tools --json`, and creation runs `connectr new` with
+the tools you picked. **This app never handles a credential**: signing in happens in
+the tool's own CLI, and ConnectR only ever checks whether a credential file exists.
 
 ## Keyboard
 
