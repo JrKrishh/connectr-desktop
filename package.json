@@ -1,6 +1,6 @@
 {
   "name": "connectr-desktop",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Windows desktop shell for the local ConnectR dashboard",
   "main": "main.js",
   "private": true,
@@ -20,7 +20,8 @@
     "appId": "com.solobrain.connectr-desktop",
     "productName": "ConnectR Desktop",
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icon.ico"
     },
     "nsis": {
       "oneClick": false,

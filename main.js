@@ -172,6 +172,7 @@ function bootstrap() {
       width: 1280,
       height: 800,
       show: true,
+      icon: path.join(__dirname, 'assets', 'icon.png'),
       webPreferences: {
         preload: PRELOAD,
         contextIsolation: true,

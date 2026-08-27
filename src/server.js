@@ -77,7 +77,7 @@ function createServerManager(deps = {}) {
     const cliPath = resolveCli();
     if (!cliPath) {
       const err = new Error(
-        'connectr CLI not found on PATH - install it with `npm i -g connectr`'
+        'connectr CLI not found on PATH - install it with `npm i -g connectr-mcp`'
       );
       err.code = 'ENOENT';
       throw err;
